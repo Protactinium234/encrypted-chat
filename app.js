@@ -1,3 +1,6 @@
+// TODO: Bold currently selected user
+// TODO: Actually add chat controls. Currently there's only one chat box for everyone
+
 let username = '';
 let socket = null;
 

@@ -1,3 +1,4 @@
+# TODO: Actually create this file correctly and compile with it
 cmake_minimum_required(VERSION 3.10)
 project(encrypted_chat)
 

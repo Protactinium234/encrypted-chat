@@ -7,7 +7,19 @@
 #define USER_MAX 30
 #define USERNAME_LEN_MAX 32
 
+// this program is FULL of security holes. 
+// The user could DoS but sending in malformed JSON, by spamming the API with dead users.
+// They could impersonate others cause there's no login verification system, 
+// Can also impersonate bc supplying the sender username is client-side
+// it's all bad
+
+// TODO: it crashes if 3 or more users join. so fix that lmao
+// TODO: this would be fun to fuzz!
+
+// TODO: Encrypt chats with OpenSSL
+
 void create_user(struct lws *wsi, char *un);
+void send_message(char *sender, char *receiver, char *message);
 
 struct UserConnection {
     char username[USERNAME_LEN_MAX];
@@ -15,6 +27,8 @@ struct UserConnection {
     
 };
 
+// Rather than iterating through this list, there's probably a better way I can do this with hashtables or something
+// It also may be better as some sort of linked list rather than an array so I can quickly remove users
 struct UserConnection user_list[USER_MAX];
 int user_count = 0;
 
@@ -31,23 +45,38 @@ static int callback_chat(struct lws *wsi, enum lws_callback_reasons reason,
             char recvd[MAX_MESSAGE_LEN];
             snprintf(recvd, MAX_MESSAGE_LEN, "%.*s", (int)len, (char *)in);
 
-            cJSON *username = cJSON_Parse(recvd); 
-            if (username == NULL) { 
+            cJSON *call = cJSON_Parse(recvd); 
+            if (call == NULL) { 
                 const char *error_ptr = cJSON_GetErrorPtr(); 
                 if (error_ptr != NULL) { 
                     printf("Error: %s\n", error_ptr); 
                 } 
-                cJSON_Delete(username); 
+                cJSON_Delete(call); 
                 return 1; 
             }
 
-            cJSON *type = cJSON_GetObjectItemCaseSensitive(username, "type"); 
-            cJSON *un = cJSON_GetObjectItemCaseSensitive(username, "username"); 
+            cJSON *type = cJSON_GetObjectItemCaseSensitive(call, "type"); 
+            cJSON *un = cJSON_GetObjectItemCaseSensitive(call, "username"); 
+            cJSON *sender = cJSON_GetObjectItemCaseSensitive(call, "sender"); 
+            cJSON *receiver = cJSON_GetObjectItemCaseSensitive(call, "receiver"); 
+            cJSON *message = cJSON_GetObjectItemCaseSensitive(call, "message"); 
+            // if it's a login message
             if (cJSON_IsString(type) && !strcmp(type->valuestring, "login") &&
-                cJSON_IsString(un) && un->valuestring != NULL && strcmp(un->valuestring, "")) { 
+                cJSON_IsString(un) && strcmp(un->valuestring, "")) { 
                 create_user(wsi,un->valuestring);
+                // putting this outside the conditional crashes it sometimes. but putting it here may not always free it and cause a memory leak
+                // TODO: Check if there's actually a leak
+                cJSON_Delete(call);
             }
-            cJSON_Delete(username);
+            else if (cJSON_IsString(type) && !strcmp(type->valuestring, "chat") &&
+                     cJSON_IsString(sender) && strcmp(sender->valuestring, "") &&
+                     cJSON_IsString(receiver) && strcmp(receiver->valuestring, "") &&
+                     cJSON_IsString(message) && strcmp(message->valuestring, "")
+                    ) {
+                send_message(sender->valuestring, receiver->valuestring, message->valuestring);
+                printf("Do you at least come back here?\n");
+                // cJSON_Delete(call);
+            }
             break;
 
         case LWS_CALLBACK_CLOSED:
@@ -146,6 +175,30 @@ void create_user(struct lws *wsi, char *un) {
             }
         }
     }
-    cJSON_Delete(send); 
+    // TODO: Check for memory leak by not freeing json_str
     // cJSON_free(json_str);
+    return;
+}
+
+void send_message(char *sender, char *receiver, char *message) {
+    printf("Sending message from %s to %s: %s\n", sender, receiver, message);
+    cJSON *send = cJSON_CreateObject();
+    char *json_str;
+    // Find reciever socket 
+    for (int i = 0; i < user_count; i++) {
+        if (!strcmp(user_list[i].username, receiver)) {
+            printf("Found receiver socket\n");
+            cJSON_AddStringToObject(send, "type", "chat");
+            cJSON_AddStringToObject(send, "sender", sender);
+            cJSON_AddStringToObject(send, "message", message);
+            printf("Sending message\n");
+            json_str = cJSON_Print(send);
+            lws_write(user_list[i].wsi, json_str, strlen(json_str), LWS_WRITE_TEXT);
+            printf("Sent message\n");
+            break;
+        }
+    }
+    cJSON_Delete(send);
+    printf("Freed\n");
+    return;
 }
