@@ -13,7 +13,7 @@
 // Can also impersonate bc supplying the sender username is client-side
 // it's all bad
 
-// TODO: it crashes if 3 or more users join. so fix that lmao
+// TODO: valgrind the hell out of this
 // TODO: this would be fun to fuzz!
 
 // TODO: Encrypt chats with OpenSSL
@@ -74,7 +74,6 @@ static int callback_chat(struct lws *wsi, enum lws_callback_reasons reason,
                      cJSON_IsString(message) && strcmp(message->valuestring, "")
                     ) {
                 send_message(sender->valuestring, receiver->valuestring, message->valuestring);
-                printf("Do you at least come back here?\n");
                 // cJSON_Delete(call);
             }
             break;
@@ -187,18 +186,14 @@ void send_message(char *sender, char *receiver, char *message) {
     // Find reciever socket 
     for (int i = 0; i < user_count; i++) {
         if (!strcmp(user_list[i].username, receiver)) {
-            printf("Found receiver socket\n");
             cJSON_AddStringToObject(send, "type", "chat");
             cJSON_AddStringToObject(send, "sender", sender);
             cJSON_AddStringToObject(send, "message", message);
-            printf("Sending message\n");
             json_str = cJSON_Print(send);
             lws_write(user_list[i].wsi, json_str, strlen(json_str), LWS_WRITE_TEXT);
-            printf("Sent message\n");
             break;
         }
     }
     cJSON_Delete(send);
-    printf("Freed\n");
     return;
 }

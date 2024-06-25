@@ -1,15 +1,18 @@
-// TODO: Bold currently selected user
-// TODO: Actually add chat controls. Currently there's only one chat box for everyone
-
 let username = '';
 let socket = null;
+let active = '';
+
+let chatBoxes = new Object();
+let liList = new Object();
+let chatWindowClone = document.getElementById('chatWindow').cloneNode(true);
+const userList = document.getElementById('userList');
 
 // Login function
 function login() {
     username = document.getElementById('username').value;
     if (username.trim() !== '') {
         document.getElementById('login').style.display = 'none';
-        document.getElementById('chat').style.display = 'block';
+        document.getElementById('chat').style.display = 'grid';
         initSocket();
     }
 }
@@ -25,13 +28,13 @@ function initSocket() {
 
     socket.onmessage = (event) => {
         const message = JSON.parse(event.data);
-        console.log(event.data);
+        // console.log(event.data);
         switch (message.type) {
             case 'userList':
                 updateUserList(message.users);
                 break;
             case 'chat':
-                displayMessage(message);
+                displayMessage(message.sender, message, false);
                 break;
             case 'error':
                 displayError(message.error);
@@ -45,7 +48,7 @@ function initSocket() {
 
     socket.onclose = () => {
         const message = 'Disconnected from server'
-        console.log(message);
+        // console.log(message);
         displayError(message)
     };
 
@@ -67,22 +70,35 @@ function displayError(message) {
 // Update the user list
 function updateUserList(users) {
     document.getElementById('errorBox').style.display = 'none';
-    const userList = document.getElementById('userList');
-    userList.innerHTML = '';
+    // userList.innerHTML = '';
+    Object.keys(liList).forEach((user) => {
+        if (!users.includes(user)) {
+            userList.removeChild(liList[user]);
+            delete liList[user];
+        }
+    });
     users.forEach((user) => {
         if (user !== username) {
-            const li = document.createElement('li');
-            li.textContent = user;
-            li.onclick = () => startChat(user);
-            userList.appendChild(li);
+            if (chatBoxes[user] === undefined) {
+                chatBoxes[user] = chatWindowClone.cloneNode(true);
+                // chatBoxes[user].innerHTML = '';
+            }
+            if (liList[user] === undefined) {
+                liList[user] = document.createElement('li');
+                liList[user].textContent = user;
+                liList[user].onclick = () => startChat(user);
+                userList.appendChild(liList[user]);
+            }
         }
     });
 }
 
 // Start chat with a user
 function startChat(user) {
-    document.getElementById('chatWindow').innerHTML = '';
     document.getElementById('messageInput').dataset.receiver = user;
+    liList[user].style.fontWeight = 'normal';
+    document.getElementById('chatWindow').replaceWith(chatBoxes[user]);
+    active = user;
 }
 
 // Send a message
@@ -98,17 +114,25 @@ function sendMessage() {
             message: message
         };
         socket.send(JSON.stringify(chatMessage));
-        displayMessage(chatMessage);
+        displayMessage(chatMessage.receiver, chatMessage, true);
         messageInput.value = '';
     }
 }
 
 // Display message in chat window
-function displayMessage(message) {
+function displayMessage(user, message, show) {
     document.getElementById('errorBox').style.display = 'none';
-    const chatWindow = document.getElementById('chatWindow');
+    const chatWindow = chatBoxes[user];
     const p = document.createElement('p');
     p.textContent = `${message.sender}: ${message.message}`;
     chatWindow.appendChild(p);
     chatWindow.scrollTop = chatWindow.scrollHeight;
+    userList.insertBefore(liList[user],userList.firstChild);
+    if (show) {
+        document.getElementById('chatWindow').replaceWith(chatWindow);
+        active = user;
+    }
+    else if (active != user) {
+        liList[user].style.fontWeight = "bold";
+    }
 }

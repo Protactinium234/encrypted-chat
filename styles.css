@@ -1,58 +1,163 @@
-/* TODO: Make it actually look good lol. ChatGPT has no taste. To be fair it did a decent job for an AI without eyes */
+/* Global styles */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #ece9e6, #ffffff);
     margin: 0;
     padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
+
 .container {
-    width: 80%;
+    width: 90%;
+    max-width: 1000px;
     margin: auto;
-    overflow: hidden;
-}
-.login, .chat {
-    background: #fff;
     padding: 20px;
-    border-radius: 5px;
-    margin-top: 50px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
 }
-.login h2, .chat h3 {
+
+/* Error box */
+.error-box {
     text-align: center;
+    color: #f00;
+    font-size: 18px;
+    display: none;
+    font-weight: bold;
 }
+
+/* Login form */
+.login {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.login h2 {
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 24px;
+}
+
+.login .input-group {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.login input {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 1px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s;
+}
+
+.login input:focus {
+    border-color: #007bff;
+}
+
+.btn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+}
+
+.btn:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.btn:active {
+    background-color: #004085;
+    transform: translateY(0px);
+}
+
+/* Chat container */
+.chat {
+    margin-top: 20px;
+    width: 100%;
+    display: none;
+    grid-template-columns: 1fr 3fr;
+}
+
+.users, .messages {
+    background: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 10px;
+    box-sizing: border-box;
+}
+
 .users {
-    float: left;
-    width: 30%;
-    border-right: 1px solid #ccc;
+    padding-right: 20px;
+    border-right: 1px solid #ddd;
 }
-.messages {
-    float: right;
-    width: 70%;
+
+.users h3 {
+    margin-bottom: 20px;
+    color: #333;
 }
-#chatWindow {
-    height: 300px;
-    border: 1px solid #ccc;
-    margin-bottom: 10px;
-    overflow-y: scroll;
-    padding: 10px;
-}
+
 #userList {
     list-style: none;
     padding: 0;
 }
+
 #userList li {
-    padding: 5px;
-    border-bottom: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+    background: #fff;
+    border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
+
 #userList li:hover {
-    background: #f4f4f4;
+    background: #f0f0f0;
 }
-.error-box {
-    text-align: center;
-    color: #f00;
-    font-size: 25px;
-    margin-top: 30px;
-    display: none;
-    font-weight: bold;
+
+.messages {
+    flex: 1;
+    padding-left: 20px;
+}
+
+#chatWindow {
+    height: 300px;
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+    overflow-y: scroll;
+    padding: 20px;
+    background: #fafafa;
+    border-radius: 5px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+}
+
+.input-group input {
+    flex: 1;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px 0 0 5px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.input-group .btn {
+    border-radius: 0 5px 5px 0;
 }
