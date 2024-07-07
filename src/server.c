@@ -7,11 +7,12 @@
 #define USER_MAX 30
 #define USERNAME_LEN_MAX 32
 
-// this program is FULL of security holes. 
+// this program is FULL of security holes (and probably bugs) (memory management is hard)
 // The user could DoS but sending in malformed JSON, by spamming the API with dead users.
 // They could impersonate others cause there's no login verification system, 
 // Can also impersonate bc supplying the sender username is client-side
 // it's all bad
+// if this is ever used in production, the CISO should be jailed
 
 // TODO: valgrind the hell out of this
 // TODO: this would be fun to fuzz!
@@ -19,6 +20,7 @@
 // TODO: Encrypt chats with OpenSSL
 
 void create_user(struct lws *wsi, char *un);
+void remove_user(struct lws *wsi);
 void send_message(char *sender, char *receiver, char *message);
 
 struct UserConnection {
@@ -37,11 +39,11 @@ static int callback_chat(struct lws *wsi, enum lws_callback_reasons reason,
 {
     switch (reason) {
         case LWS_CALLBACK_ESTABLISHED:
-            printf("WebSocket connection established\n");
+            printf("New WebSocket connection established\n");
             break;
 
         case LWS_CALLBACK_RECEIVE:
-            printf("Received: %.*s\n", (int)len, (char *)in);
+            // printf("Received: %.*s\n", (int)len, (char *)in);
             char recvd[MAX_MESSAGE_LEN];
             snprintf(recvd, MAX_MESSAGE_LEN, "%.*s", (int)len, (char *)in);
 
@@ -79,8 +81,7 @@ static int callback_chat(struct lws *wsi, enum lws_callback_reasons reason,
             break;
 
         case LWS_CALLBACK_CLOSED:
-            printf("Connection closed\n");
-            // remove_user(wsi);
+            remove_user(wsi);
             break;
 
         default:
@@ -195,5 +196,35 @@ void send_message(char *sender, char *receiver, char *message) {
         }
     }
     cJSON_Delete(send);
+    return;
+}
+
+void remove_user(struct lws *wsi) {
+    // For each user, check if that was the one that disconnected
+    for (int i = 0; i < user_count; i++) {
+        if (wsi == user_list[i].wsi) {
+            char *json_str;
+            cJSON *send = cJSON_CreateObject();
+            // Remove user from list of users
+            printf("Removing User %s\n",user_list[i].username);
+            for (int j = i; j < user_count; j++) {
+                user_list[j] = user_list[j+1];
+            }
+            user_count--;
+            // Update everyone's active user list
+            cJSON_AddStringToObject(send, "type", "userList"); 
+            cJSON *users = cJSON_CreateArray();
+            cJSON_AddItemToObject(send, "users", users);
+            for (int i = 0; i < user_count; i++) {
+                cJSON_AddItemToArray(users, cJSON_CreateString(user_list[i].username));
+                printf("User #%i:%s\n",i,user_list[i].username);
+            }
+            json_str = cJSON_Print(send);
+            for (int i = 0; i < user_count; i++) {
+                lws_write(user_list[i].wsi, json_str, strlen(json_str), LWS_WRITE_TEXT);
+            }
+            cJSON_Delete(send);
+        }
+    }
     return;
 }

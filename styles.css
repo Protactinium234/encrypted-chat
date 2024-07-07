@@ -117,6 +117,9 @@ body {
 }
 
 #userList li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 10px;
     margin-bottom: 10px;
     background: #fff;
@@ -127,6 +130,17 @@ body {
 
 #userList li:hover {
     background: #f0f0f0;
+}
+
+.unread-count {
+    background-color: red;
+    color: white;
+    border-radius: 35%;
+    padding: 2px 6px;
+    font-size: 12px;
+    margin-left: 10px;
+    vertical-align: middle;
+    flex-shrink: 0;
 }
 
 .messages {
