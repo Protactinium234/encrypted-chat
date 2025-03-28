@@ -4,4 +4,19 @@ project(encrypted_chat)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(chat_server src/chat_server.c)
+# Add cJSON as a subdirectory
+add_subdirectory(cJSON)
+
+# Include directories
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/cJSON)
+
+# Add your source files
+set(SOURCES
+    src/server.c
+)
+
+# Create the executable
+add_executable(chat_server ${SOURCES})
+
+# Link cJSON library to your executable
+target_link_libraries(chat_server cjson)

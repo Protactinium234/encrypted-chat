@@ -13,6 +13,9 @@ WORKDIR /usr/src/app
 # Copy the project files to the working directory
 COPY . .
 
+# Initialize and update submodules
+RUN git submodule update --init --recursive
+
 # Create a build directory
 RUN mkdir -p build
 
