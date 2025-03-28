@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <libwebsockets.h>
-#include "cjson/cJSON.h"
+#include "../cjson/cJSON.h"
 #include <stdbool.h>
 
 #define MAX_MESSAGE_LEN 512
