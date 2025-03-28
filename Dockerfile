@@ -5,16 +5,13 @@ FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install necessary packages
-RUN apt-get update && apt-get install -y cmake build-essential libssl-dev nginx libwebsockets-dev git && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y cmake build-essential libssl-dev nginx libwebsockets-dev libcjson1 libcjson-dev && rm -rf /var/lib/apt/lists/*
 
 # Create and set the working directory
 WORKDIR /usr/src/app
 
 # Copy the project files to the working directory
 COPY . .
-
-# Clone cJSON repository
-RUN git clone https://github.com/DaveGamble/cJSON.git
 
 # Create a build directory
 RUN mkdir -p build
