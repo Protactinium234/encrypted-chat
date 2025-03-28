@@ -5,11 +5,8 @@ project(encrypted_chat)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
-# Find the cJSON package
-find_package(cjson REQUIRED)
-
 # Include directories
-include_directories(${CJSON_INCLUDE_DIRS})
+include_directories(/usr/include)
 
 # Add your source files
 set(SOURCES
