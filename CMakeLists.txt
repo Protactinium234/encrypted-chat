@@ -1,7 +1,15 @@
 cmake_minimum_required(VERSION 3.10)
 project(encrypted_chat)
 
+# Set the C standard to C11
 set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED True)
+
+# Find the cJSON package
+find_package(cjson REQUIRED)
+
+# Include directories
+include_directories(${CJSON_INCLUDE_DIRS})
 
 # Add your source files
 set(SOURCES
@@ -11,3 +19,9 @@ set(SOURCES
 
 # Create the executable
 add_executable(chat_server ${SOURCES})
+
+# Link cJSON library to your executable
+target_link_libraries(chat_server ${CJSON_LIBRARIES})
+
+# Enable verbose output
+set(CMAKE_VERBOSE_MAKEFILE ON)
