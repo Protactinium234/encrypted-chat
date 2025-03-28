@@ -7,6 +7,7 @@ set(CMAKE_C_STANDARD_REQUIRED True)
 
 # Include directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/cJSON)
+include_directories(/usr/include)
 
 # Add your source files
 set(SOURCES
@@ -16,6 +17,8 @@ set(SOURCES
 
 # Create the executable
 add_executable(chat_server ${SOURCES})
+
+target_link_libraries(encrypted_chat websockets)
 
 # Enable verbose output
 set(CMAKE_VERBOSE_MAKEFILE ON)
