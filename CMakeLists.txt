@@ -12,7 +12,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/cJSON)
 
 # Add your source files
 set(SOURCES
-    src/server.c
+    src/chat_server.c
 )
 
 # Create the executable
