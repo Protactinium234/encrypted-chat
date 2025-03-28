@@ -29,6 +29,10 @@ RUN make
 RUN mkdir -p /var/www/html/static
 COPY static /var/www/html/static
 
+# Set the correct permissions for the static files
+RUN chown -R www-data:www-data /var/www/html 
+    && chmod -R 755 /var/www/html
+
 # Copy Nginx configuration file
 COPY nginx.conf /etc/nginx/nginx.conf
 
