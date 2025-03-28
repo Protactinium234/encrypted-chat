@@ -18,7 +18,7 @@ set(SOURCES
 # Create the executable
 add_executable(chat_server ${SOURCES})
 
-target_link_libraries(encrypted_chat websockets)
+target_link_libraries(chat_server websockets)
 
 # Enable verbose output
 set(CMAKE_VERBOSE_MAKEFILE ON)
