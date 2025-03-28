@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 project(encrypted_chat)
 
+set(CMAKE_C_STANDARD 11)
+
 # Add your source files
 set(SOURCES
     src/chat_server.c

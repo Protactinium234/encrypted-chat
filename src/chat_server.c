@@ -43,6 +43,7 @@ static int callback_chat(struct lws *wsi, enum lws_callback_reasons reason,
             break;
 
         case LWS_CALLBACK_RECEIVE:
+        {
             // printf("Received: %.*s\n", (int)len, (char *)in);
             char recvd[MAX_MESSAGE_LEN];
             snprintf(recvd, MAX_MESSAGE_LEN, "%.*s", (int)len, (char *)in);
@@ -79,6 +80,7 @@ static int callback_chat(struct lws *wsi, enum lws_callback_reasons reason,
                 // cJSON_Delete(call);
             }
             break;
+        }
 
         case LWS_CALLBACK_CLOSED:
             remove_user(wsi);
