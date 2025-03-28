@@ -12,10 +12,9 @@ WORKDIR /usr/src/app
 
 # Copy the project files to the working directory
 COPY . .
-COPY ./.gitmodules .
 
-# Initialize and update submodules
-RUN git submodule update --init --recursive
+# Clone cJSON repository
+RUN git clone https://github.com/DaveGamble/cJSON.git
 
 # Create a build directory
 RUN mkdir -p build
@@ -43,4 +42,4 @@ EXPOSE 80
 EXPOSE 8080
 
 # Command to run both Nginx and the backend server
-CMD service nginx start && ./chat_server
+CMD service nginx start && ./encrypted_chat
