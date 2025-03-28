@@ -12,6 +12,7 @@ WORKDIR /usr/src/app
 
 # Copy the project files to the working directory
 COPY . .
+COPY ./.gitmodules .
 
 # Initialize and update submodules
 RUN git submodule update --init --recursive
