@@ -6,19 +6,16 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
 # Include directories
-include_directories(/usr/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/cJSON)
 
 # Add your source files
 set(SOURCES
     src/chat_server.c
-    # Add other source files here
+    cjson/cJSON.c
 )
 
 # Create the executable
 add_executable(chat_server ${SOURCES})
-
-# Link cJSON library to your executable
-target_link_libraries(chat_server ${CJSON_LIBRARIES})
 
 # Enable verbose output
 set(CMAKE_VERBOSE_MAKEFILE ON)

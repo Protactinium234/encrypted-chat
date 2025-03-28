@@ -39,4 +39,4 @@ EXPOSE 80
 EXPOSE 8080
 
 # Command to run both Nginx and the backend server
-CMD service nginx start && ./encrypted_chat
+CMD service nginx start && ./chat_server
